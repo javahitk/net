@@ -1,4 +1,4 @@
-SERVER-
+SCIENTIFIC SERVER-
 #include<sys/socket.h>
 #include<sys/types.h>
 #include<netinet/in.h>
@@ -104,7 +104,7 @@ int main()
         close(listenfd);
     	return 0;
 }
-CLIENT-
+SCIENTIFIC CLIENT-
 #include<sys/types.h>
 #include<sys/socket.h>
 #include<netinet/in.h>
