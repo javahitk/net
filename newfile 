@@ -561,8 +561,9 @@ int main() {
 
 ------------------------------------------
 
-//TCP CHAT SERVER
 
+-----------------------------------+-++----
+TCP CHAT SERVER
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <netinet/in.h>
@@ -610,11 +611,10 @@ int main() {
 
     cli_addr_len = sizeof(cli_addr);
     for (;;) {
-        printf("\nSERVER: Waiting for client connections... Press Ctrl+C to terminate.\n");
-
+        
         if ((connfd = accept(listenfd, (struct sockaddr*)&cli_addr, &cli_addr_len)) < 0) {
             perror("SERVER ERROR: Cannot accept connection");
-            continue;
+           
         }
         printf("\nSERVER: Connected to client at %s.\n", inet_ntoa(cli_addr.sin_addr));
 
@@ -630,11 +630,7 @@ int main() {
             select(connfd + 1, &read_fds, NULL, NULL, NULL);
 
             if (FD_ISSET(STDIN_FILENO, &read_fds)) {
-                bzero(buff, BUFFER_SIZE);
-                fgets(buff, BUFFER_SIZE, stdin);
-                buff[strcspn(buff, "\n")] = 0;
-                printf("SERVER: %s\n", buff);
-                write(connfd, buff, strlen(buff) + 1);
+              (connfd, buff, strlen(buff) + 1);
 
                 if (strcmp(buff, "exit") == 0) {
                     printf("\nSERVER: Disconnected client manually.\n");
@@ -650,9 +646,7 @@ int main() {
                 }
                 printf("\nCLIENT: %s\n", buff);
 
-                if (strcmp(buff, "exit") == 0) {
-                    printf("\nSERVER: Client requested disconnection.\n");
-                    break;
+                
                 }
             }
         }
@@ -661,11 +655,7 @@ int main() {
     }
 }
 
-
-
-
-/TCP CHAT CLIENT
-
+TCP CHAT CLIENT
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <netinet/in.h>
@@ -720,3 +710,27 @@ int main() {
             fgets(buff, BUFFER_SIZE, stdin);
             buff[strcspn(buff, "\n")] = 0;
             printf("CLIENT: %s\n", buff);
+            write(sockfd, buff, strlen(buff) + 1);
+
+            if (strcmp(buff, "exit") == 0) {
+                break;
+            }
+        }
+
+        if (FD_ISSET(sockfd, &read_fds)) {
+            bzero(buff, BUFFER_SIZE);
+            if (read(sockfd, buff, BUFFER_SIZE) <= 0) break;
+
+            printf("\nSERVER: %s\n", buff);
+
+            if (strcmp(buff, "exit") == 0) {
+                printf("\nCLIENT: Server requested disconnection.\n");
+                break;
+            }
+        }
+    }
+
+    printf("\nCLIENT: Disconnected from server.\n");
+    close(sockfd);
+    return 0;
+}
